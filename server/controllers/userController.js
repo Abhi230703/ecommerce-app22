@@ -26,11 +26,17 @@ const registerUser = async (req,res) =>{
                 password:hashedPassword
             });
 
+             if (!name || !email || !password) {
+  res.status(400);
+  throw new Error("All fields are required");
+}
+
             res.status(200).json({
                 _id:user._id,
                 name:user.name,
                 email:user.email
             })
+
     } catch (error) {
 
         res.status(500).json({

@@ -13,6 +13,10 @@ const createProduct = async (req,res) =>{
                         user:req.user._id
                     });
                     
+                    if (!name || !price || !description) {
+  res.status(400);
+  throw new Error("All fields are required");
+}
                     res.status(201).json(product);
 
             } catch (error) {
