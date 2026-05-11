@@ -6,12 +6,13 @@ const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productsRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const cors = require("cors");
+const categoryRoutes = require("./routes/categoryRoutes");
 
 connectDB();
 
 const app = express();
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:5173",
     credentials:true
 }))
 
@@ -23,6 +24,7 @@ app.get("/",(req,res)=>{
 app.use("/api/users",userRoutes);
 app.use("/api/products",productRoutes);
 app.use("/api/orders",orderRoutes);
+app.use("/api/categories",categoryRoutes);
 
 const PORT = process.env.PORT || 5000;
 

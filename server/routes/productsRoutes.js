@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const {createProduct,getProducts,getProductById,updateproduct,deleteProduct} = require("../controllers/productController");
+const {createProduct,getProducts,getProductById,updateProduct,deleteProduct} = require("../controllers/productController");
 const {protect} = require("../middleware/authMiddleware");
 const {admin} = require("../middleware/adminMiddleware");
 const upload = require("../middleware/uploadMiddleware");
@@ -12,7 +12,7 @@ router.route("/")
 
 router.route("/:id")
 .get(getProductById)
-.put(protect,admin,upload.single("image"),updateproduct)
+.put(protect,admin,upload.single("image"),updateProduct)
 .delete(protect,admin,deleteProduct);
 
 

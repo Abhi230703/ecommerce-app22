@@ -2,11 +2,15 @@ const Order = require("../models/orderModel");
 
 const createOrder =  async(req,res) =>{
     try {
-        const { orderItems, totalPrice} = req.body;
+        const { orderItems } = req.body;
 
-        if(orderItems === 0){
+        if(!orderItems || orderItems.length === 0){
             res.status(400).json({message:"No order items"});
         }
+
+        const totalPrice = orderItems.reduce(
+            (acc ,item) => acc + item.price * item.qty, 0
+        )
 
         const order = new Order({
             user:req.user._id,
@@ -14,8 +18,8 @@ const createOrder =  async(req,res) =>{
             totalPrice,
         });
 
-        const createOrder = await order.save();
-        res.status(201).json(createOrder);
+        const createdOrder = await order.save();
+        res.status(201).json(createdOrder);
 
     } catch (error) {
         res.status(500).json({message:error.message});
@@ -26,6 +30,17 @@ const getMyOrders = async(req,res) =>{
     const orders = await Order.find({user:req.user._id});
     res.json(orders);
 };
+
+const getOrderById = async(req,res)=>{
+    try {
+    const order = await Order.findById(req.params.id);
+    if(!order) return res.status(404).json({message:"Order not Found"});
+    res.json(order);
+    
+    } catch (error) {
+    res.status(500).json({message:error.message})    
+    }
+}
 
 const markAsPaid = async(req,res) =>{
     try {
@@ -88,4 +103,4 @@ const getTotalRevenue = async(req,res) =>{
 }
 
 
-module.exports = { createOrder, getMyOrders,markAsPaid,markAsDelivered,getAllOrders,getTotalRevenue};
+module.exports = { createOrder, getMyOrders,markAsPaid,markAsDelivered,getAllOrders,getTotalRevenue,getOrderById};

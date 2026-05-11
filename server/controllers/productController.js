@@ -3,38 +3,70 @@ const cloudinary = require("../config/cloudinary");
 
 const createProduct = async (req,res) =>{
             try {
-                    const {name,price,description} = req.body || {};
+                    const {name,price,description,category} = req.body || {};
+
+                    
+                    if (!name || !price || !description) {
+                                                 res.status(400);
+                                                 throw new Error("All fields are required");
+                                                         }
                     
                     const product = await Product.create({
                         name,
-                        price,
+                        price:Number(price),
                         description,
+                        category: category || null,
                         image: req.file ? req.file.path : "",
                         user:req.user._id
                     });
                     
-                    if (!name || !price || !description) {
-  res.status(400);
-  throw new Error("All fields are required");
-}
                     res.status(201).json(product);
 
             } catch (error) {
+                console.log(error);
                     res.status(500).json({message:error.message});
             }    
 };
 
 const getProducts = async (req,res) =>{
+    const minPrice = Number(req.query.minPrice) || 0;
+    const maxPrice = Number(req.query.maxPrice) || 1000000;
+
     try {
+        
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 5;
         const keyword = req.query.keyword
         ? {name:{$regex : req.query.keyword, $options:"i"}}
         : {};
 
-        const count = await Product.countDocuments({...keyword});
+        const categoryFilter = req.query.category
+  ? { category: req.query.category } 
+  : {};
+       
+        let sortOption = {};
 
-        const products = await Product.find({...keyword})
+        if(req.query.sort === "low"){
+            sortOption = {price: 1};
+        }
+        else if(req.query.sort === "high"){
+            sortOption = {price:-1};
+        }
+        else{
+            sortOption = {createdAt:-1};
+        }
+
+        const filterPrice = {
+            price :{$gte:minPrice ,$lte:maxPrice},
+        }
+
+        const finalFilter = {...keyword, ...filterPrice,...categoryFilter};
+
+        const count = await Product.countDocuments(finalFilter);
+
+        const products = await Product.find(finalFilter)
+          .populate("category", "name slug") 
+        .sort(sortOption)
         .limit(limit)
         .skip(limit *(page -1));
 
@@ -48,6 +80,8 @@ const getProducts = async (req,res) =>{
         });
 
     } catch (error) {
+        console.log(error);
+        
         res.status(500).json({message:error.message});
     }
 }
@@ -61,7 +95,7 @@ const getProductById = async (req,res) =>{
             res.json(product);
         }
         else{
-            res.status(404).json({message:"Product not found"});
+           return res.status(404).json({message:"Product not found"});
         }
     } catch (error) {
         res.status(500).json({message:error.message});
@@ -69,17 +103,18 @@ const getProductById = async (req,res) =>{
 };
 
 //update product
-const updateproduct = async(req,res) =>{
+const updateProduct = async(req,res) =>{
 try {
     const product = await Product.findById(req.params.id);
 
     if(!product){
-       res.status(404).json({message:"Product not found"});
+       return res.status(404).json({message:"Product not found"});
     }
 
         product.name = req.body.name || product.name;
-        product.price = req.body.price || product.price;
+        product.price = req.body.price? Number(req.body.price) : product.price;
         product.description = req.body.description || product.description;
+        product.category = req.body.category ?? product.category;
 
         if(req.file){
             if(product.image){
@@ -104,7 +139,7 @@ const deleteProduct = async(req,res) =>{
         const product = await Product.findById(req.params.id);
 
         if(!product){
-            res.status(404).json({message:"Product not found"});
+            return res.status(404).json({message:"Product not found"});
             
         }
         if(product.image){
@@ -125,4 +160,4 @@ const deleteProduct = async(req,res) =>{
 };
 
 
-module.exports = {createProduct,getProducts,getProductById,updateproduct,deleteProduct};
+module.exports = {createProduct,getProducts,getProductById,updateProduct,deleteProduct};
