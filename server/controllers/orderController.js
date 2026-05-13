@@ -52,6 +52,13 @@ const markAsPaid = async(req,res) =>{
 
          order.isPaid = true;
          order.paidAt = Date.now();
+
+         order.paymentResult = {
+  id: req.body.razorpayPaymentId,
+  status: "completed",
+  update_time: new Date().toISOString(),
+  email_address: req.user.email,
+};
          
          const updatedOrder = await order.save();
          res.json(updatedOrder);

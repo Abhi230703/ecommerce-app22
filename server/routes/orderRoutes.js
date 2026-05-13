@@ -18,7 +18,7 @@ router.get("/revenue",protect,admin,getTotalRevenue);
 
 router.get("/",protect,admin,getAllOrders);
 router.get("/:id", protect, getOrderById); 
-router.put("/:id/pay",protect,admin,markAsPaid);
+router.put("/:id/pay",protect,markAsPaid);
 router.put("/:id/deliver",protect,admin,markAsDelivered);
 
 

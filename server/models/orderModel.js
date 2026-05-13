@@ -35,6 +35,17 @@ paidAt:{
     type:Date,
 },
 
+paidAt: {
+  type: Date,
+},
+
+paymentResult: {
+  id: { type: String },
+  status: { type: String },
+  update_time: { type: String },
+  email_address: { type: String },
+},
+
 isDelivered:{
 type:Boolean,
 default:false

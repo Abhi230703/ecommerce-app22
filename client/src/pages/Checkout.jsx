@@ -17,28 +17,6 @@ function Checkout (){
 
   const formatPrice = (n) => "₹" + Number(n).toLocaleString("en-IN");
 
-  const placeOrder = async () => {
-    if (!userInfo?.token) { navigate("/login"); return; }
-
-    try {
-      setLoading(true);
-      const { data } = await API.post(
-        "/orders",
-        { orderItems: cart },
-        { headers: { Authorization: `Bearer ${userInfo.token}` } }
-      );
-      console.log("Order success:", data);
-      toast.success("Order placed successfully!");
-      setCart([]);
-      localStorage.removeItem("cart");
-      navigate("/orders");
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response?.data?.message || "Order failed");
-    } finally {
-      setLoading(false);
-    }
-  };
 
     if (cart.length === 0) {
     return (
@@ -55,6 +33,85 @@ function Checkout (){
       </div>
     );
   }
+
+  const handlePayment = async () => {
+  try {
+    setLoading(true);
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+    if (!userInfo?.token) {
+      navigate("/login");
+      return;
+    }
+
+    const totalAmount = cart.reduce(
+      (acc, item) => acc + item.price * item.qty, 0
+    );
+
+    const { data: order } = await API.post(
+      "/orders",
+      { orderItems: cart },
+      { headers: { Authorization: `Bearer ${userInfo.token}` } }
+    );
+
+    const { data } = await API.post(
+      "/payment/create-order",
+      { amount: totalAmount },
+      { headers: { Authorization: `Bearer ${userInfo.token}` } }
+    );
+
+    if (!window.Razorpay) {
+      toast.error("Payment gateway not loaded. Please refresh.");
+      setLoading(false);
+      return;
+    }
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY,
+      amount: data.amount,
+      currency: data.currency,
+      name: "E-Shop",
+      description: "Order Payment",
+      order_id: data.id,
+
+      handler: async function (response) {
+        try {
+          await API.put(
+            `/orders/${order._id}/pay`,
+            { razorpayPaymentId: response.razorpay_payment_id },
+            { headers: { Authorization: `Bearer ${userInfo.token}` } }
+          );
+          toast.success("Payment Successful");
+          setCart([]);
+          localStorage.removeItem("cart");
+          navigate("/orders");
+        } catch (error) {
+          console.log(error);
+          toast.error("Payment verification failed");
+        } finally {
+          setLoading(false); // ✅ after payment handler
+        }
+      },
+
+      theme: { color: "#111827" },
+    };
+
+    const razor = new window.Razorpay(options);
+
+    razor.on("payment.failed", function () {
+      toast.error("Payment Failed");
+      setLoading(false); // ✅ on failure
+    });
+
+    razor.open();      // ✅ correctly outside everything
+    setLoading(false); // ✅ once modal opens
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Payment Failed");
+    setLoading(false); // ✅ if any API call fails
+  }
+};
 
 
     return(
@@ -131,7 +188,7 @@ function Checkout (){
         </div>
 
         <button
-          onClick={placeOrder}
+          onClick={handlePayment}
           disabled={loading}
           className="w-full mt-4 py-2.5 bg-green-500 hover:bg-green-600 
                      disabled:opacity-60 disabled:cursor-not-allowed
@@ -140,14 +197,14 @@ function Checkout (){
           {loading ? (
             <>
               <svg className="animate-spin" width="15" height="15" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2">
+                fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 12a9 9 0 1 1-6.219-8.56" />
               </svg>
               Placing order…
             </>
           ) : (
             <>
-              <CheckCircle size={15} /> Place order
+              <CheckCircle size={15} />Pay Now
             </>
           )}
         </button>
