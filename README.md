@@ -1,23 +1,95 @@
 # 🛒 MERN E-commerce App
+A full-stack ecommerce web application built using the MERN stack with authentication, admin dashboard, Razorpay payment integration, product management, and responsive SaaS-style UI.
+
+## Live Demo
+Frontend: https://your-frontend.vercel.app  
+Backend API: https://your-backend.onrender.com
 
 ## 🚀 Features
-- User Authentication (JWT)
-- Product CRUD
-- Image Upload (Cloudinary)
-- Cart & Orders
-- Payment Integration
+-  User Authentication (JWT)
 - Admin Dashboard
+- Product CRUD
+- Cart System
+- Checkout Flow
+- Razorpay Payment Integration
+- Order Management
+- Search & Filters
+- Pagination
+- Responsive Design
+- Cloudinary Image Upload
+- Toast Notifications
+- Skeleton Loading UI
 
 ## 🛠 Tech Stack
-- Frontend: React.js
-- Backend: Node.js, Express
-- Database: MongoDB
+
+### Frontend
+- React
+- Vite
+- Tailwind CSS
+- React Router
+- Axios
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT Authentication
+
+### Deployment
+- Vercel
+- Render
+- MongoDB Atlas
+- Cloudinary
 
 ## 📂 Project Structure
 client/
 server/
 
-## ⚙️ Setup
+## ⚙️Backend Setup
 cd server
 npm install
-npm start
+npx nodemon index.js
+
+## ⚙️Frontend Setup
+cd client
+npm install
+npm run dev
+
+## Installation
+### Clone repository
+
+```bash
+git clone <repo-url>
+
+
+---
+
+# ✅ 8. Environment Variables
+
+```md id="r15"
+## Environment Variables
+
+### Backend (.env)
+
+PORT=
+MONGO_URI=
+JWT_SECRET=
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+
+### Frontend (.env)
+
+VITE_API_URL=
+VITE_RAZORPAY_KEY=
+
+## Future Improvements
+
+- Product reviews & ratings
+- Wishlist functionality
+- Email notifications
+- Advanced analytics dashboard
+- Webhook payment verification
