@@ -2,8 +2,8 @@
 A full-stack ecommerce web application built using the MERN stack with authentication, admin dashboard, Razorpay payment integration, product management, and responsive SaaS-style UI.
 
 ## Live Demo
-Frontend: https://your-frontend.vercel.app  
-Backend API: https://your-backend.onrender.com
+Frontend: https://ecommerce-app22.vercel.app
+Backend API: https://ecommerce-app22.onrender.com
 
 ## 🚀 Features
 -  User Authentication (JWT)
