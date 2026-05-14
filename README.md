@@ -56,14 +56,6 @@ cd client
 npm install
 npm run dev
 
-## Installation
-### Clone repository
-
-```bash
-git clone <repo-url>
-
-
----
 
 # ✅ 8. Environment Variables
 
@@ -93,3 +85,12 @@ VITE_RAZORPAY_KEY=
 - Email notifications
 - Advanced analytics dashboard
 - Webhook payment verification
+
+## Installation
+### Clone repository
+
+```bash
+git clone <repo-url>
+
+
+---
