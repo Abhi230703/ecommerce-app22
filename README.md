@@ -56,6 +56,14 @@ cd client
 npm install
 npm run dev
 
+## Future Improvements
+
+- Product reviews & ratings
+- Wishlist functionality
+- Email notifications
+- Advanced analytics dashboard
+- Webhook payment verification
+
 
 # ✅ 8. Environment Variables
 
@@ -78,13 +86,7 @@ RAZORPAY_KEY_SECRET=
 VITE_API_URL=
 VITE_RAZORPAY_KEY=
 
-## Future Improvements
 
-- Product reviews & ratings
-- Wishlist functionality
-- Email notifications
-- Advanced analytics dashboard
-- Webhook payment verification
 
 ## Installation
 ### Clone repository
@@ -94,3 +96,5 @@ git clone <repo-url>
 
 
 ---
+
+
