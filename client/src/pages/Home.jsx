@@ -26,6 +26,7 @@ function Home() {
   const [data, setData] = useState({ products: [], pages: 1, page: 1 });
   const [categories, setcategories] = useState([]);
   const selectedCategory = params.get("category") || "";
+  const productList = Array.isArray(products) ? products : [];
 
   useEffect(() => {
     fetchCategories().then(({ data }) => setcategories(data));
@@ -46,7 +47,7 @@ function Home() {
         const query = location.search;
         const { data: resData } = await API.get(`/products${query}`);
         setData(resData);
-        setProducts(resData.products);
+        setProducts(Array.isArray(resData?.products) ? resData.products : []);
       } catch (error) {
         console.log(error);
         setError(error.response?.data?.message || "Something went wrong");
@@ -84,7 +85,7 @@ function Home() {
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-semibold text-gray-700">
               All Products
-              <span className="text-gray-400 font-normal ml-2">({products.length})</span>
+              <span className="text-gray-400 font-normal ml-2">({productList.length})</span>
             </h1>
           </div>
         )}
@@ -174,7 +175,7 @@ function Home() {
             </button>
           </div>
         </div>
-      ) : products.length === 0 ? (
+      ) : productList.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="text-5xl mb-4">📦</div>
           <h2 className="text-xl font-semibold text-gray-700">No Products Found</h2>
@@ -188,11 +189,11 @@ function Home() {
       ) : (
         // ✅ 1 col → 2 col → 3 col
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {products.map(product => (<ProductCard key={product._id} product={product} />))}
+          {productList.map(product => (<ProductCard key={product._id} product={product} />))}
         </div>
       )}
 
-      {!loading && !error && products.length > 0 && (
+      {!loading && !error && productList.length > 0 && (
         <Pagination pages={data.pages} page={data.page} />
       )}
 

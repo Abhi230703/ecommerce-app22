@@ -12,7 +12,7 @@ function CategoryPills({ categories=[], selected, onSelect }) {
         All
       </button>
 
-      {categories.map((cat) => (
+      {(Array.isArray(categories) ? categories : []).map((cat) => (
         <button
           key={cat._id}
           onClick={() => onSelect(cat._id)}
