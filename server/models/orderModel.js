@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const { image } = require("../config/cloudinary");
-const Product = require("./Product");
 
 const orderSchema = mongoose.Schema({
     user:{
@@ -35,10 +33,6 @@ paidAt:{
     type:Date,
 },
 
-paidAt: {
-  type: Date,
-},
-
 paymentResult: {
   id: { type: String },
   status: { type: String },
@@ -59,5 +53,8 @@ deliveredAt:{
     timestamps:true,
 }
 );
+
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ isPaid: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Order",orderSchema);

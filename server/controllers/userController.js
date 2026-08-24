@@ -6,11 +6,14 @@ const registerUser = async (req,res) =>{
 
     try {
             const {name,email,password} = req.body;
+            if (!name || !email || !password) {
+                return res.status(400).json({ message: "All fields are required" });
+            }
               
             //check user exits or not
             const userExits = await User.findOne({email})
             if(userExits){
-                res.status(400).json({
+                return res.status(400).json({
                     message:"User already exists"
                 });
             }
@@ -25,11 +28,6 @@ const registerUser = async (req,res) =>{
                 email,
                 password:hashedPassword
             });
-
-             if (!name || !email || !password) {
-  res.status(400);
-  throw new Error("All fields are required");
-}
 
             res.status(200).json({
                 _id:user._id,

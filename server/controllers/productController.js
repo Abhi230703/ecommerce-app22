@@ -35,7 +35,7 @@ const getProducts = async (req,res) =>{
     try {
         
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 5;
+        const limit = Math.min(Math.max(parseInt(req.query.limit) || 5, 1), 100);
         const keyword = req.query.keyword
         ? {name:{$regex : req.query.keyword, $options:"i"}}
         : {};
