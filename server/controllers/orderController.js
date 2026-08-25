@@ -1,6 +1,12 @@
 const Order = require("../models/orderModel");
 const Product = require("../models/Product");
 const mongoose = require("mongoose");
+const crypto = require("crypto");
+
+const verifyPaymentSignature = (orderId, paymentId, signature) => {
+    const expectedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).update(`${orderId}|${paymentId}`).digest("hex");
+    return typeof signature === "string" && signature.length === expectedSignature.length && crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
+};
 
 const createOrder =  async(req,res) =>{
     try {
@@ -63,16 +69,20 @@ const markAsPaid = async(req,res) =>{
             return res.status(404).json({message:"Order not found"});
         }
         if (String(order.user) !== String(req.user._id)) return res.status(403).json({message:"Not authorized to pay for this order"});
+        if (order.isPaid) return res.status(400).json({message:"Order is already paid"});
+
+         const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
+         if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature || order.paymentResult?.orderId !== razorpayOrderId) {
+            return res.status(400).json({message:"Invalid payment details"});
+         }
+
+         if (!verifyPaymentSignature(razorpayOrderId, razorpayPaymentId, razorpaySignature)) {
+            return res.status(400).json({message:"Payment verification failed"});
+         }
 
          order.isPaid = true;
          order.paidAt = Date.now();
-
-         order.paymentResult = {
-  id: req.body.razorpayPaymentId,
-  status: "completed",
-  update_time: new Date().toISOString(),
-  email_address: req.user.email,
-};
+         order.paymentResult = { orderId: razorpayOrderId, id: razorpayPaymentId, status: "completed", update_time: new Date().toISOString(), email_address: req.user.email };
          
          const updatedOrder = await order.save();
          res.json(updatedOrder);
@@ -124,4 +134,4 @@ const getTotalRevenue = async(req,res) =>{
 }
 
 
-module.exports = { createOrder, getMyOrders,markAsPaid,markAsDelivered,getAllOrders,getTotalRevenue,getOrderById};
+module.exports = { createOrder, getMyOrders,markAsPaid,markAsDelivered,getAllOrders,getTotalRevenue,getOrderById,verifyPaymentSignature};

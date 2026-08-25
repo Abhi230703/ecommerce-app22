@@ -34,6 +34,7 @@ paidAt:{
 },
 
 paymentResult: {
+  orderId: { type: String },
   id: { type: String },
   status: { type: String },
   update_time: { type: String },
