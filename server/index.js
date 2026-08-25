@@ -8,6 +8,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const cors = require("cors");
 const categoryRoutes = require("./routes/categoryRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const { paymentWebhook } = require("./controllers/paymentController");
 const mongoose = require("mongoose");
 const { requestContext, securityHeaders } = require("./middleware/requestContext");
 
@@ -24,6 +25,7 @@ app.use(
   })
 );
 
+app.post("/api/payment/webhook", express.raw({ type: "application/json" }), paymentWebhook);
 app.use(express.json({ limit: "1mb" }));
 app.get("/",(req,res)=>{
     res.send("api is running.....");
