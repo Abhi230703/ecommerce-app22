@@ -1,19 +1,22 @@
 const Product = require("../models/Product");
 const cloudinary = require("../config/cloudinary");
 
+const parsePrice = (value) => {
+    const price = Number(value);
+    return value !== "" && Number.isFinite(price) && price >= 0 ? price : null;
+};
+
 const createProduct = async (req,res) =>{
             try {
                     const {name,price,description,category} = req.body || {};
+                    const normalizedPrice = parsePrice(price);
 
-                    
-                    if (!name || !price || !description) {
-                                                 res.status(400);
-                                                 throw new Error("All fields are required");
-                                                         }
+                    if (!name || price === undefined || !description) return res.status(400).json({ message: "All fields are required" });
+                    if (normalizedPrice === null) return res.status(400).json({ message: "Price must be a non-negative number" });
                     
                     const product = await Product.create({
                         name,
-                        price:Number(price),
+                        price:normalizedPrice,
                         description,
                         category: category || null,
                         image: req.file ? req.file.path : "",
@@ -112,7 +115,11 @@ try {
     }
 
         product.name = req.body.name || product.name;
-        product.price = req.body.price? Number(req.body.price) : product.price;
+        if (req.body.price !== undefined) {
+            const normalizedPrice = parsePrice(req.body.price);
+            if (normalizedPrice === null) return res.status(400).json({ message: "Price must be a non-negative number" });
+            product.price = normalizedPrice;
+        }
         product.description = req.body.description || product.description;
         product.category = req.body.category ?? product.category;
 
@@ -160,4 +167,4 @@ const deleteProduct = async(req,res) =>{
 };
 
 
-module.exports = {createProduct,getProducts,getProductById,updateProduct,deleteProduct};
+module.exports = {createProduct,getProducts,getProductById,updateProduct,deleteProduct,parsePrice};
